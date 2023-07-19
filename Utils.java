@@ -12,21 +12,15 @@ public class Utils {
 
 	public static void lireFichierInstancierGraphe(String nomFichier, Graphe graphe) {
 
-		boolean section1 = true; // on est a la section 1 (=noms des sommets), sinon on est au noms des arretes  
-
+		boolean section1 = true; // indique si on est a la section 1 (=noms des sommets), sinon on est au noms des arretes  
 
 		try{
 			FileReader fileReader = new FileReader(nomFichier);
 			BufferedReader br = new BufferedReader(fileReader);
 			String line;
 
-			int linenb = 0; //pour deboguage 
-
-
 			while((line = br.readLine()) != null) {
 				line=line.trim();
-				linenb++; //pour deboguage 
-
 
 				if (line.equals("---")) {
 					section1 = false; // signale qu on passe a la prochaine section
@@ -34,8 +28,6 @@ public class Utils {
 				}
 
 				if (section1) { // dans section 1, on instancie les sommets 
-
-					// instancier sommet et mettre dans graphe
 					Sommet sommet = new Sommet(line);
 					graphe.getTousSommets().put(line, sommet);
 
@@ -64,26 +56,36 @@ public class Utils {
 					sommetB.getAretesSortantes().put(nomArete+":"+nomSommetB+"-"+nomSommetA, areteBA); // dans b comment sortante
 				}
 			}
+			br.close();
 		} catch (IOException e) {
 			System.err.println("Error reading file: " + e.getMessage());
 			System.out.println("Absolute path:" + new File(nomFichier).getAbsolutePath());
 		}
 	}
 
-	public static void algoPrim(Graphe graphe) {
+	/**
+	 * Algorithme Prim Jarnik ARM  
+	 * 
+	 * Complexité : O((V+E)log(E)+V)
+	 * (+V est pour la partie print)  
+	 * 
+	 * @param graphe
+	 * @return String conforme à l'output demandé (tous les sommets et aretes visités dans l'ordre) 
+	 * pour écrire dans fichier final
+	 */
+	public static String algoPrim(Graphe graphe) {
 		StringBuilder toPrint = new StringBuilder();
 
-		//convertir en hashset pour marquer somme comme visité 
+		//convertir en hashset pour marquer sommet visité 
 		TreeMap<String, Sommet> tousSommets = graphe.getTousSommets();
 		HashSet<String> sommetsAExplorer = new HashSet<>(tousSommets.keySet());
 
-		// initialiser sommets visités (vide au début)
+		// initialiser sommets et aretes visités (vide au début)
 		HashSet<String> sommetsVisites = new HashSet<>(); 
-
+		TreeMap<String,Arete> aretesVisites = new TreeMap<>();
+		
 		// initialiser priority queue
 		PriorityQueue<Arete> queue = new PriorityQueue<>();
-
-		TreeMap<String,Arete> aretesVisites = new TreeMap<>();
 
 		// commencer : 
 		Sommet sommet = tousSommets.firstEntry().getValue();//"premier" sommet (alphanumerique)
@@ -94,8 +96,8 @@ public class Utils {
 		System.out.println("start");
 		System.out.println("sommetsAExplorer:"+sommetsAExplorer);
 
-		// tant qu on n'a pas tout visité
-		while(!sommetsAExplorer.equals(sommetsVisites)){
+		// Complexité ici : O(V+E) pour parcourir tous les sommets (O(V)) et chaque arête 2 fois (dans chaque sens) : O(E)
+		while(!sommetsAExplorer.equals(sommetsVisites)){ // tant qu'on n'a pas tout visité
 
 			// marquer sommet comme visité
 			sommetsVisites.add(sommet.getNomSommet());
@@ -104,36 +106,36 @@ public class Utils {
 			System.out.println("sommets Visites:" + sommetsVisites);
 
 			// pour toutes les aretes (aux sommets non visités), mettre dans PQ
+			// Complexité : pour ajouter à la PQ, O(logE) 
 			for (Arete arete : sommet.getAretesSortantes().values()) {
 				if (!sommetsVisites.contains(arete.getSommet2().getNomSommet())) { // non visité 
-					queue.add(arete);// ajouter si non visite
+					queue.add(arete);// ajouter si non visite // Complexité O(logN)
 				}
 			}
 
 			System.out.println("queue:" + queue);
 
-			// parcourir queue jusqua ce qu on arrive à un sommet non visité 
-
-			Sommet dernierSommet = sommet;
+			// Complexité : O(logE) pour l'operation poll 
 			// mnt que la PQ est à jour, prendre le min
 			int poidsAAjouter = 0;
-			Arete areteMin = queue.poll(); // enlever premier		
-			String sommet1 = areteMin.getSommet1().getNomSommet();
+			Arete areteMin = queue.poll(); // enlever premier // Complexité O(logE)
 			String sommet2 = areteMin.getSommet2().getNomSommet();
 
-			// mais on veut s'assurer qu'on est sur la bonne arete (qui va nous servir)
+			// mais on veut s'assurer qu'on est sur la bonne arete (pas de cycles)
 			// tant qu'on est sur une arete amenant à un sommet déjà visite, dequeue (enlever) 
 			// jusqu'à ce qu'on arrive sur une arete amenant à un sommet non visité OU queue vide
+			// Complexité : ici on est sur toutes les aretes, et on appelle poll (O(logN)), 
+			// au maximum, on peut avoir 2*E (une fois dans les deux sens) => O(logE)
 			while (sommetsVisites.contains(sommet2) && !queue.isEmpty()) { 
-				areteMin = queue.poll(); // dequeue: prendre prochaine arete 
+				areteMin = queue.poll(); // dequeue: prendre prochaine arete // O(logN)
 				System.out.println("...enlever + " + areteMin);
 				sommet2 = areteMin.getSommet2().getNomSommet();	
 			}
 
-
 			// une fois qu'on est sur la BONNE arete 
-			if(!sommetsVisites.contains(sommet2)) { // si arete amene a sommet non visité
-				aretesVisites.put(areteMin.getNomArete() + areteMin.getSommet1() + areteMin.getSommet2(), areteMin); // eg. key: rue0ab 
+			if(!sommetsVisites.contains(sommet2)) { // si arete amene à un sommet non visité
+				// Complexité de l'opération put TreeMap O(logV) (V car le nombre d'aretes retenus = V-1)
+				aretesVisites.put(areteMin.getSommet1().getNomSommet() + "-" + areteMin.getSommet2().getNomSommet(), areteMin); // eg. key: a-b 
 
 				System.out.println("arete min : " + areteMin);
 				sommet = areteMin.getSommet2(); // pour passer au prochain sommet
@@ -141,17 +143,16 @@ public class Utils {
 				coutTotal += poidsAAjouter;
 				System.out.println("-------");
 			}
-
-
-
-
 		}
-
-		// preparer toprint (une fois triés)
+		
+		// Complexité : Pour toPrint, parcourir tous les sommets visités dans ARM : O(V)
+		// preparer toPrint (une fois triés)
 		for (String s : sommetsVisites) {
 			toPrint.append(s+"\n");
 		}
 
+		// Complexité : parcourir tous les arêtes visités O(V)
+		// (V parce que le nombre d'aretes retenues sera V-1)
 		for (Entry<String, Arete> a : aretesVisites.entrySet()) {
 			toPrint.append(a.getValue().toString()+"\n");
 		}
@@ -161,5 +162,12 @@ public class Utils {
 		toPrint.append(coutTotal);
 		System.out.println("cout total = " + coutTotal);
 		System.out.println(toPrint.toString());
+		
+		return toPrint.toString();
+	}
+	
+	public static void creerFichier(String nomFichier) {
+		// file writer ... 
+		// TODO 
 	}
 }	

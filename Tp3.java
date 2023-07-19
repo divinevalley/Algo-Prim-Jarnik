@@ -8,7 +8,7 @@ public class Tp3 {
 		// C:\Users\Deanna\Documents\UdeM\IFT2015 structures de donnees\Devoir3\Tp3\Tp3\src
 		
 		// test: nom fichier : 
-		String args0 = "carte10.txt";
+		String args0 = "carte3.txt";
 		
 		
 		// construire le path pour chercher le nom du fichier desiré

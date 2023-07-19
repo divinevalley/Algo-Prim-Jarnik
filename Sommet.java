@@ -3,7 +3,7 @@ import java.util.TreeMap;
 
 
 public class Sommet {
-		private String nomSommet;
+		private final String nomSommet;
 		private TreeMap<String, Arete> aretesSortantes;
 //		private TreeMap<String, Arete> aretesEntrantes;  
 		

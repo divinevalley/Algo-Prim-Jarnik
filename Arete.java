@@ -1,8 +1,8 @@
 public class Arete implements Comparable<Arete>{
-		private String nomArete; // eg. rue0
-		private Sommet sommet1;
-		private Sommet sommet2;
-		private int poids;
+		private final String nomArete; // eg. rue0
+		private final Sommet sommet1;
+		private final Sommet sommet2;
+		private final int poids;
 
 
 		public Arete(String nomArete, Sommet sommet1, Sommet sommet2, int poids) {
@@ -57,12 +57,8 @@ public class Arete implements Comparable<Arete>{
 				return compareSommet1;
 			} else {
 				return compareSommet2; // si nom sommet 1 identique, comparer nom sommet 2
-			}
-			
-			
+			}	
 		}
-		
-		
 
 
 	}
