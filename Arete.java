@@ -1,4 +1,4 @@
-public class Arete implements Comparable<Arete>{
+public class Arete {
 		private final String nomArete; // eg. rue0
 		private final Sommet sommet1;
 		private final Sommet sommet2;
@@ -43,21 +43,6 @@ public class Arete implements Comparable<Arete>{
 		@Override
 		public String toString() {
 			return nomArete + "\t" + sommet1.getNomSommet() + "\t" + sommet2.getNomSommet() + "\t" + poids;
-		}
-
-		@Override
-		public int compareTo(Arete o) { // pour que min Heap se base sur poids 
-			int comparePoids =Integer.compare(this.poids, o.poids); 
-			int compareSommet1 = this.sommet1.getNomSommet().compareTo(o.sommet1.getNomSommet());
-			int compareSommet2 = this.sommet2.getNomSommet().compareTo(o.sommet2.getNomSommet());
-			
-			if (comparePoids != 0) { // si poids differents, d'abord comparer poids
-				return comparePoids;
-			} else if  (compareSommet1 != 0) { // si poids identiques, comparer nom sommet1, si ceci non identique
-				return compareSommet1;
-			} else {
-				return compareSommet2; // si nom sommet 1 identique, comparer nom sommet 2
-			}	
 		}
 
 

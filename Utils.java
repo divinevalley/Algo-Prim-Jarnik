@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
@@ -10,6 +11,14 @@ import java.util.TreeSet;
 
 public class Utils {
 
+	/**Complexité : pour instancier le graphe, on parcourt tous les v sommets et toutes les e arêtes. O(v+e)
+	 *  
+	 *  Lire le fichier txt et instancie un graphe avec ses sommets et ses arêtes 
+	 *  
+	 * @param nomFichier
+	 * @param objet Graphe instancié
+	 */
+	
 	public static void lireFichierInstancierGraphe(String nomFichier, Graphe graphe) {
 
 		boolean section1 = true; // indique si on est a la section 1 (=noms des sommets), sinon on est au noms des arretes  
@@ -64,7 +73,7 @@ public class Utils {
 	}
 
 	/**
-	 * Algorithme Prim Jarnik ARM  
+	 * Applique l'algorithme Prim Jarnik ARM sur le graphe rentré en paramètre et renvoie un String conforme à l'output demandé 
 	 * 
 	 * Complexité : O((V+E)log(E)+V)
 	 * (+V est pour la partie print)  
@@ -81,15 +90,15 @@ public class Utils {
 		HashSet<String> sommetsAExplorer = new HashSet<>(tousSommets.keySet());
 
 		// initialiser sommets et aretes visités (vide au début)
-		HashSet<String> sommetsVisites = new HashSet<>(); 
-		TreeMap<String,Arete> aretesVisites = new TreeMap<>();
+		TreeSet<String> sommetsVisites = new TreeSet<>(); 
+		TreeSet<Arete> aretesVisites = new TreeSet<>(new ComparatorAretesToPrint()); // trié alphanumérique
 		
 		// initialiser priority queue
-		PriorityQueue<Arete> queue = new PriorityQueue<>();
+		PriorityQueue<Arete> queue = new PriorityQueue<>(new ComparatorPoidsAretes());
 
-		// commencer : 
-		Sommet sommet = tousSommets.firstEntry().getValue();//"premier" sommet (alphanumerique)
-		sommetsVisites.add(sommet.getNomSommet());	// marquer sommet comme visité
+		// commencer par le premier sommet, et marquer visité: 
+		Sommet sommet = tousSommets.firstEntry().getValue();
+		sommetsVisites.add(sommet.getNomSommet());
 
 		int coutTotal = 0;
 
@@ -105,7 +114,7 @@ public class Utils {
 			System.out.println("mnt sommet = " + sommet);
 			System.out.println("sommets Visites:" + sommetsVisites);
 
-			// pour toutes les aretes (aux sommets non visités), mettre dans PQ
+			// pour toutes les aretes, mettre dans PQ si ça amene à un sommet non visité
 			// Complexité : pour ajouter à la PQ, O(logE) 
 			for (Arete arete : sommet.getAretesSortantes().values()) {
 				if (!sommetsVisites.contains(arete.getSommet2().getNomSommet())) { // non visité 
@@ -115,7 +124,7 @@ public class Utils {
 
 			System.out.println("queue:" + queue);
 
-			// Complexité : O(logE) pour l'operation poll 
+			// Complexité : O(logE) pour l'operation poll (dequeue)
 			// mnt que la PQ est à jour, prendre le min
 			int poidsAAjouter = 0;
 			Arete areteMin = queue.poll(); // enlever premier // Complexité O(logE)
@@ -135,7 +144,7 @@ public class Utils {
 			// une fois qu'on est sur la BONNE arete 
 			if(!sommetsVisites.contains(sommet2)) { // si arete amene à un sommet non visité
 				// Complexité de l'opération put TreeMap O(logV) (V car le nombre d'aretes retenus = V-1)
-				aretesVisites.put(areteMin.getSommet1().getNomSommet() + "-" + areteMin.getSommet2().getNomSommet(), areteMin); // eg. key: a-b 
+				aretesVisites.add(areteMin); // sera trié 
 
 				System.out.println("arete min : " + areteMin);
 				sommet = areteMin.getSommet2(); // pour passer au prochain sommet
@@ -153,8 +162,8 @@ public class Utils {
 
 		// Complexité : parcourir tous les arêtes visités O(V)
 		// (V parce que le nombre d'aretes retenues sera V-1)
-		for (Entry<String, Arete> a : aretesVisites.entrySet()) {
-			toPrint.append(a.getValue().toString()+"\n");
+		for (Arete a : aretesVisites) {
+			toPrint.append(a.toString()+"\n");
 		}
 
 		toPrint.append("---\n");
