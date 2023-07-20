@@ -12,38 +12,25 @@
  * toutes les arêtes visitées (ordre alphanumérique du sommet de départ, ou sommet d'arrivée si somme de départ identique)
  * coût total 
  * 
- * 
- * 
  * @args args0 représente le nom du fichier d'entrée, args1 représente le nom du fichier de sortie
  * @author Deanna
  *
  */
 public class Tp3 {
 	public static void main(String[] args) {
-
-		// C:\Users\Deanna\Documents\UdeM\IFT2015 structures de donnees\Devoir3\Tp3\Tp3\src
-		
-		// test: nom fichier : 
-		String args0 = "carte6.txt";
-		String args1 = "fichiersortie.txt";
 		
 		// construire le path pour chercher le nom du fichier desiré
 		String path = System.getProperty("user.dir"); 
+		path += "/" + args[0];
 		
-		path = "C:\\Users\\Deanna\\Documents\\UdeM\\IFT2015 structures de donnees\\Devoir3\\testsTP3E19";
-		path += "/" + args0;
-		
-		
+		// initialiser
 		Graphe graphe = new Graphe();
 		
-		Utils.lireFichierInstancierGraphe(path, graphe);
-		
-//		System.out.println(graphe.toString());
-		
+		// lire fichier, faire algo Prim, creer fichier final
+		graphe = Utils.lireFichierInstancierGraphe(path, graphe);
 		String toPrint = Utils.algoPrim(graphe);
-		Utils.creerFichierFinal(args1, toPrint);
+		Utils.creerFichierFinal(args[1], toPrint);
 		
 	}
-	
 
 }

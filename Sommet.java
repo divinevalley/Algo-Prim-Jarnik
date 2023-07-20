@@ -6,26 +6,28 @@ import java.util.TreeMap;
  *
  */
 public class Sommet {
-		private final String nomSommet;
-		private TreeMap<String, Arete> aretesSortantes;
-		
-		public Sommet(String nom) {
-			nomSommet = nom;
-			aretesSortantes = new TreeMap<>();
-		}
+	private final String nomSommet;
+	private TreeMap<String, Arete> aretesSortantes;
 
-		public String getNomSommet() {
-			return nomSommet;
-		}
-
-		public TreeMap<String, Arete> getAretesSortantes() {
-			return aretesSortantes;
-		}
-
-		@Override
-		public String toString() {
-			return nomSommet + ", aretesSortantes=" + aretesSortantes;
-		}
-		
-
+	// constructeur
+	public Sommet(String nom) {
+		nomSommet = nom;
+		aretesSortantes = new TreeMap<>();
 	}
+
+	//getters
+	public String getNomSommet() {
+		return nomSommet;
+	}
+
+	public TreeMap<String, Arete> getAretesSortantes() {
+		return aretesSortantes;
+	}
+
+	@Override
+	public String toString() {
+		return nomSommet + ", aretesSortantes=" + aretesSortantes;
+	}
+
+
+}

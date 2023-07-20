@@ -23,7 +23,7 @@ public class Utils {
 	 * @param nomFichier
 	 * @param objet Graphe instancié
 	 */
-	public static void lireFichierInstancierGraphe(String nomFichier, Graphe graphe) {
+	public static Graphe lireFichierInstancierGraphe(String nomFichier, Graphe graphe) {
 
 		boolean section1 = true; // indique si on est a la section 1 (sommets), sinon ça veut dire qu'on est à la section 2 (arretes)  
 
@@ -74,6 +74,7 @@ public class Utils {
 			System.err.println("Error reading file: " + e.getMessage());
 			System.out.println("Absolute path:" + new File(nomFichier).getAbsolutePath());
 		}
+		return graphe;
 	}
 
 	/**
@@ -164,7 +165,6 @@ public class Utils {
 		toPrint.append("---\n");
 
 		toPrint.append(coutTotal);
-		System.out.println(toPrint.toString());
 		
 		return toPrint.toString();
 	}

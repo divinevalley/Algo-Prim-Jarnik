@@ -11,7 +11,7 @@ public class Arete {
 		private final Sommet sommet2; // sommet "d'arrivée"
 		private final int poids;
 
-
+		//constructeur
 		public Arete(String nomArete, Sommet sommet1, Sommet sommet2, int poids) {
 			this.nomArete = nomArete;
 			this.sommet1 = sommet1;
