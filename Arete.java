@@ -1,7 +1,14 @@
+/**
+ * Représente les arêtes ("rues") avec des noms, des poids (coût), et leurs neouds (sites publics) de départ/d'arrivée. 
+ * (Il n'y a pas réellement de notion de départ/d'arrivée vu que les rues sont à deux sens.) 
+ *  
+ * @author Deanna Wung
+ *
+ */
 public class Arete {
 		private final String nomArete; // eg. rue0
-		private final Sommet sommet1;
-		private final Sommet sommet2;
+		private final Sommet sommet1; // sommet "de départ"
+		private final Sommet sommet2; // sommet "d'arrivée"
 		private final int poids;
 
 
@@ -29,16 +36,6 @@ public class Arete {
 			return poids;
 		}
 		
-		// methode
-		// comme les aretes sont bidirectionnelle, ça permet de récupérer le sommet qui est différent  
-		// supposition que sommet passe en param est inclu dans sommet1 ou sommet2
-		public Sommet prendreSommetVoisin(Sommet sommet) {
-			if (sommet == sommet1) { // on veut passer a L'AUTRE sommet qui est différent
-				return sommet2;
-			} else {
-				return sommet1;
-			}
-		}
 
 		@Override
 		public String toString() {

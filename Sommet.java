@@ -1,15 +1,16 @@
 import java.util.TreeMap;
-
-
-
+/**
+ * les Sommets représentent les "places publiques" à relier dans l'énoncé. 
+ *   
+ * @author Deanna Wung
+ *
+ */
 public class Sommet {
 		private final String nomSommet;
 		private TreeMap<String, Arete> aretesSortantes;
-//		private TreeMap<String, Arete> aretesEntrantes;  
 		
 		public Sommet(String nom) {
 			nomSommet = nom;
-//			aretesEntrantes = new TreeMap<>();
 			aretesSortantes = new TreeMap<>();
 		}
 
@@ -25,12 +26,6 @@ public class Sommet {
 		public String toString() {
 			return nomSommet + ", aretesSortantes=" + aretesSortantes;
 		}
-
-//		public TreeMap<String, Arete> getAretesEntrantes() {
-//			return aretesEntrantes;
-//		}
-		
-		
 		
 
 	}

@@ -1,27 +1,31 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/**
+ * La classe Utils sert à refactor toutes les fonctions (toutes static) dont on a besoin, 
+ * et ne sera jamais instanciée. 
+ *  
+ * @author Deanna Wung
+ */
 public class Utils {
 
-	/**Complexité : pour instancier le graphe, on parcourt tous les v sommets et toutes les e arêtes. O(v+e)
-	 *  
-	 *  Lire le fichier txt et instancie un graphe avec ses sommets et ses arêtes 
-	 *  
+	/** 
+	 * Lire le fichier txt et instancie un graphe avec tous ses sommets et ses arêtes 
+	 * Complexité : pour instancier le graphe, on parcourt tous les v sommets et toutes les e arêtes. O(v+e)
+	 * 
 	 * @param nomFichier
 	 * @param objet Graphe instancié
 	 */
-	
 	public static void lireFichierInstancierGraphe(String nomFichier, Graphe graphe) {
 
-		boolean section1 = true; // indique si on est a la section 1 (=noms des sommets), sinon on est au noms des arretes  
+		boolean section1 = true; // indique si on est a la section 1 (sommets), sinon ça veut dire qu'on est à la section 2 (arretes)  
 
 		try{
 			FileReader fileReader = new FileReader(nomFichier);
@@ -32,7 +36,7 @@ public class Utils {
 				line=line.trim();
 
 				if (line.equals("---")) {
-					section1 = false; // signale qu on passe a la prochaine section
+					section1 = false; // signale qu'on passe à la prochaine section
 					continue; // recommencer boucle
 				}
 
@@ -73,9 +77,11 @@ public class Utils {
 	}
 
 	/**
-	 * Applique l'algorithme Prim Jarnik ARM sur le graphe rentré en paramètre et renvoie un String conforme à l'output demandé 
+	 * Applique l'algorithme Prim Jarnik ARM sur le graphe passé en paramètre et renvoie un String conforme à l'output demandé
+	 * (d'abord tous les sommets visités en ordre alphanumérique, ensuite toutes les arêtes visitées en ordre alpha selon 
+	 * sommet de départ, ou selon sommet d'arrivée si égal)  
 	 * 
-	 * Complexité : O((V+E)log(E)+V)
+	 * Complexité : O(ElogE+VlogV+V)
 	 * (+V est pour la partie print)  
 	 * 
 	 * @param graphe
@@ -91,10 +97,10 @@ public class Utils {
 
 		// initialiser sommets et aretes visités (vide au début)
 		TreeSet<String> sommetsVisites = new TreeSet<>(); 
-		TreeSet<Arete> aretesVisites = new TreeSet<>(new ComparatorAretesToPrint()); // trié alphanumérique
+		TreeSet<Arete> aretesVisites = new TreeSet<>(new ComparatorAretesToPrint()); // trié alphanumérique sommet de départ, sommet d'arrivée
 		
 		// initialiser priority queue
-		PriorityQueue<Arete> queue = new PriorityQueue<>(new ComparatorPoidsAretes());
+		PriorityQueue<Arete> queue = new PriorityQueue<>(new ComparatorPoidsAretes()); // trié par poids, ensuite selon l'énoncé
 
 		// commencer par le premier sommet, et marquer visité: 
 		Sommet sommet = tousSommets.firstEntry().getValue();
@@ -102,55 +108,44 @@ public class Utils {
 
 		int coutTotal = 0;
 
-		System.out.println("start");
-		System.out.println("sommetsAExplorer:"+sommetsAExplorer);
-
 		// Complexité ici : O(V+E) pour parcourir tous les sommets (O(V)) et chaque arête 2 fois (dans chaque sens) : O(E)
-		while(!sommetsAExplorer.equals(sommetsVisites)){ // tant qu'on n'a pas tout visité
+		while(sommetsAExplorer.size()!=(sommetsVisites.size())){ // tant qu'on n'a pas tout visité
 
 			// marquer sommet comme visité
 			sommetsVisites.add(sommet.getNomSommet());
 
-			System.out.println("mnt sommet = " + sommet);
-			System.out.println("sommets Visites:" + sommetsVisites);
-
-			// pour toutes les aretes, mettre dans PQ si ça amene à un sommet non visité
-			// Complexité : pour ajouter à la PQ, O(logE) 
+			// pour toutes les aretes, mettre dans PQ si ça amene à un sommet non visité. 
+			// Complexité : Parcourt toutes les E arêtes 2 fois (2 sens)  
+			// et pour chacune, ajouter à la PQ, O(logE). donc globale : O(E*logE) 
 			for (Arete arete : sommet.getAretesSortantes().values()) {
 				if (!sommetsVisites.contains(arete.getSommet2().getNomSommet())) { // non visité 
 					queue.add(arete);// ajouter si non visite // Complexité O(logN)
 				}
 			}
 
-			System.out.println("queue:" + queue);
-
-			// Complexité : O(logE) pour l'operation poll (dequeue)
 			// mnt que la PQ est à jour, prendre le min
+			// Complexité : O(logE) pour l'operation dequeue (poll)
 			int poidsAAjouter = 0;
 			Arete areteMin = queue.poll(); // enlever premier // Complexité O(logE)
 			String sommet2 = areteMin.getSommet2().getNomSommet();
 
-			// mais on veut s'assurer qu'on est sur la bonne arete (pas de cycles)
-			// tant qu'on est sur une arete amenant à un sommet déjà visite, dequeue (enlever) 
-			// jusqu'à ce qu'on arrive sur une arete amenant à un sommet non visité OU queue vide
-			// Complexité : ici on est sur toutes les aretes, et on appelle poll (O(logN)), 
-			// au maximum, on peut avoir 2*E (une fois dans les deux sens) => O(logE)
+			// s'assurer qu'on est sur la bonne arete (pas de cycles)
+			// tant qu'on est sur une arete amenant à un sommet déjà visite, dequeue
+			// Complexité : Parcourt toutes les aretes, et (possiblement) appelle poll (O(logN)), 
+			// au maximum, on peut avoir 2*E (une fois dans les deux sens) => O(ElogE)
 			while (sommetsVisites.contains(sommet2) && !queue.isEmpty()) { 
 				areteMin = queue.poll(); // dequeue: prendre prochaine arete // O(logN)
-				System.out.println("...enlever + " + areteMin);
 				sommet2 = areteMin.getSommet2().getNomSommet();	
 			}
 
-			// une fois qu'on est sur la BONNE arete 
+			// une fois qu'on est sur la BONNE arete, ajouter sur TreeMap  
+			// Complexité O(VlogV) pour put TreeMap (V au lieu de E car le nombre d'aretes retenus = V-1)
 			if(!sommetsVisites.contains(sommet2)) { // si arete amene à un sommet non visité
-				// Complexité de l'opération put TreeMap O(logV) (V car le nombre d'aretes retenus = V-1)
 				aretesVisites.add(areteMin); // sera trié 
 
-				System.out.println("arete min : " + areteMin);
 				sommet = areteMin.getSommet2(); // pour passer au prochain sommet
 				poidsAAjouter = areteMin.getPoids();
 				coutTotal += poidsAAjouter;
-				System.out.println("-------");
 			}
 		}
 		
@@ -169,14 +164,36 @@ public class Utils {
 		toPrint.append("---\n");
 
 		toPrint.append(coutTotal);
-		System.out.println("cout total = " + coutTotal);
 		System.out.println(toPrint.toString());
 		
 		return toPrint.toString();
 	}
+
 	
-	public static void creerFichier(String nomFichier) {
-		// file writer ... 
-		// TODO 
+	/***
+	 * Cette fonction crée le fichier .txt final. 
+	 * 
+	 * @param nomFichierTxt
+	 * @param contenuFichier
+	 */
+	public static void creerFichierFinal(String nomFichierTxt, String contenuFichier) {
+		try {
+			File fichierACreer = new File(nomFichierTxt); //pour créer fichier
+			if (fichierACreer.createNewFile()) {
+			}
+		} catch (IOException e) {
+			System.out.println("Erreur creation du fichier");
+			e.printStackTrace();
+		}
+
+		try {
+			FileWriter fileWriter = new FileWriter(nomFichierTxt); //pour écrire dans le fichier
+			fileWriter.write(contenuFichier);
+			fileWriter.close();
+		} catch (IOException e) {
+			System.out.println("Erreur chargement du contenu fichier");
+			e.printStackTrace();
+		}
 	}
+
 }	

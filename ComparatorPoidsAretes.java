@@ -1,7 +1,8 @@
 import java.util.Comparator;
 
 /**
- * Se base sur POIDS, ensuite selon énoncé : 
+ * Pour un tri qui se base sur POIDS des arêtes, si égal, ensuite selon énoncé :
+ *  
  * Les arêtes de mêmes poids doivent être traitées selon l’ordre 
  * alphanumérique des nœuds de départs et dans le cas d’égalité des poids et des nœuds
  * de départs, utiliserez l’ordre alphanumérique des nœuds d’arrivés.

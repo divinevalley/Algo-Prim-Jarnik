@@ -1,5 +1,9 @@
 import java.util.TreeMap;
 
+/**
+ * @author Deanna Wung
+ *
+ */
 public class Graphe {
 	private TreeMap<String, Sommet> tousSommets;
 	
